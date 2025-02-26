@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const ttsSelect = document.getElementById("tts-select");
-  const saveBtn = document.getElementById("save-btn");
 
   // Load the current TTS option from localStorage or default to 'edge-tts'
   chrome.storage.sync.get("ttsEngine", (data) => {
@@ -12,9 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Save the selected TTS engine when the button is clicked
-  saveBtn.addEventListener("click", () => {
+  ttsSelect.addEventListener("change", () => {
     const selectedEngine = ttsSelect.value;
     chrome.storage.sync.set({ ttsEngine: selectedEngine }, () => {
+      console.log('Settings saved for:', selectedEngine);
     });
   });
 });
