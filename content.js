@@ -5,12 +5,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const base64Audio = message.audioBase64;
 
     if (base64Audio) {
-      // Check if there is an existing audio player, and remove it if present
-      const existingAudio = document.querySelector('.audio-player-container');
-      if (existingAudio) {
-        existingAudio.remove();
-      }
-
       // Convert the base64 string back to a Blob
       const byteCharacters = atob(base64Audio); // Decode base64
       const byteArrays = [];
@@ -30,7 +24,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const audioBlob = new Blob(byteArrays, { type: "audio/mp3" });
       const audioURL = URL.createObjectURL(audioBlob);
 
-      // Create a container div for the audio player and close button
+      // Create a container div for the new audio player
       const audioContainer = document.createElement("div");
       audioContainer.classList.add("audio-player-container");
 
@@ -39,6 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       audioElement.src = audioURL;
       audioElement.controls = true;  // Show controls (play/pause)
       audioElement.autoplay = true;  // Automatically start playing
+      audioElement.style.height = "38px";
 
       // Create the close button (X)
       const closeButton = document.createElement("button");
@@ -48,14 +43,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Add an event listener to close the audio player when clicked
       closeButton.addEventListener("click", () => {
         audioContainer.remove();  // Remove the entire audio container (audio + close button)
+        adjustAudioPositions();   // Re-adjust positions after removal
       });
 
       // Append the audio element and the close button to the container
       audioContainer.appendChild(audioElement);
       audioContainer.appendChild(closeButton);
 
+      // Count existing audio players
+      const existingPlayers = document.querySelectorAll('.audio-player-container');
+
+      // Set dynamic positioning so each new player appears above the previous one
+      const baseBottom = 10; // Initial bottom position
+      const spacing = 56; // Space between players
+      audioContainer.style.bottom = `${baseBottom + (existingPlayers.length * spacing)}px`;
+      audioContainer.style.right = "10px"; // Keep it fixed to the right
+
       // Append the container to the body
       document.body.appendChild(audioContainer);
+
+      // Function to re-adjust audio positions when one is removed
+      function adjustAudioPositions() {
+        const players = document.querySelectorAll('.audio-player-container');
+        players.forEach((player, index) => {
+          player.style.bottom = `${baseBottom + (index * spacing)}px`;
+        });
+      }
+
     } else {
       console.error('No audio data received');
     }
@@ -93,4 +107,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
 
   }
-});
+  else if (message.action === "getSelectedText") {
+    const selectedText = window.getSelection().toString();
+    if (selectedText) {
+      sendResponse({ success: true, text: selectedText });
+    };
+  }
+}
+);
