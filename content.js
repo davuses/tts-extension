@@ -23,53 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       const audioBlob = new Blob(byteArrays, { type: "audio/mp3" });
       const audioURL = URL.createObjectURL(audioBlob);
-
-      // Create a container div for the new audio player
-      const audioContainer = document.createElement("div");
-      audioContainer.classList.add("audio-player-container");
-
-      // Create the audio element
-      const audioElement = document.createElement("audio");
-      audioElement.src = audioURL;
-      audioElement.controls = true;  // Show controls (play/pause)
-      audioElement.autoplay = true;  // Automatically start playing
-      audioElement.style.height = "38px";
-
-      // Create the close button (X)
-      const closeButton = document.createElement("button");
-      closeButton.innerHTML = "&times;";  // Use an HTML entity for a "×" symbol
-      closeButton.classList.add("close-button");
-
-      // Add an event listener to close the audio player when clicked
-      closeButton.addEventListener("click", () => {
-        audioContainer.remove();  // Remove the entire audio container (audio + close button)
-        adjustAudioPositions();   // Re-adjust positions after removal
-      });
-
-      // Append the audio element and the close button to the container
-      audioContainer.appendChild(audioElement);
-      audioContainer.appendChild(closeButton);
-
-      // Count existing audio players
-      const existingPlayers = document.querySelectorAll('.audio-player-container');
-
-      // Set dynamic positioning so each new player appears above the previous one
-      const baseBottom = 10; // Initial bottom position
-      const spacing = 56; // Space between players
-      audioContainer.style.bottom = `${baseBottom + (existingPlayers.length * spacing)}px`;
-      audioContainer.style.right = "10px"; // Keep it fixed to the right
-
-      // Append the container to the body
-      document.body.appendChild(audioContainer);
-
-      // Function to re-adjust audio positions when one is removed
-      function adjustAudioPositions() {
-        const players = document.querySelectorAll('.audio-player-container');
-        players.forEach((player, index) => {
-          player.style.bottom = `${baseBottom + (index * spacing)}px`;
-        });
-      }
-
+      createAudioPlayer(audioURL);
     } else {
       console.error('No audio data received');
     }
@@ -79,31 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     generateAudio(text, 'en-US-AndrewNeural', { pitch: 0, rate: 0 }).then(
       url => {
         const audioURL = url;
-        const audioContainer = document.createElement("div");
-        audioContainer.classList.add("audio-player-container");
-
-        // Create the audio element
-        const audioElement = document.createElement("audio");
-        audioElement.src = audioURL;
-        audioElement.controls = true;  // Show controls (play/pause)
-        audioElement.autoplay = true;  // Automatically start playing
-
-        // Create the close button (X)
-        const closeButton = document.createElement("button");
-        closeButton.innerHTML = "&times;";  // Use an HTML entity for a "×" symbol
-        closeButton.classList.add("close-button");
-
-        // Add an event listener to close the audio player when clicked
-        closeButton.addEventListener("click", () => {
-          audioContainer.remove();  // Remove the entire audio container (audio + close button)
-        });
-
-        // Append the audio element and the close button to the container
-        audioContainer.appendChild(audioElement);
-        audioContainer.appendChild(closeButton);
-
-        // Append the container to the body
-        document.body.appendChild(audioContainer);
+        createAudioPlayer(audioURL);
       });
 
   }
@@ -115,3 +45,82 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 }
 );
+
+function createAudioPlayer(audioURL) {
+  // Create or reuse the Clear All button
+
+  let clearAllButton = document.querySelector('#clear-all-audio-button');
+  if (!clearAllButton) {
+    clearAllButton = document.createElement("button");
+    clearAllButton.id = "clear-all-audio-button";
+    clearAllButton.textContent = "Clear";
+    clearAllButton.style.position = "fixed";
+    clearAllButton.style.bottom = "10px";
+    clearAllButton.style.right = "375px";
+    clearAllButton.style.marginBottom = "8px";
+    clearAllButton.style.padding = "8px 12px";
+    clearAllButton.style.backgroundColor = "#e74c3c";
+    clearAllButton.style.color = "white";
+    clearAllButton.style.border = "none";
+    clearAllButton.style.borderRadius = "26px";
+    clearAllButton.style.cursor = "pointer";
+    clearAllButton.style.zIndex = "10000";
+    clearAllButton.style.fontWeight = "bold";
+
+    clearAllButton.addEventListener("click", () => {
+      document.querySelectorAll('.audio-player-container').forEach(el => el.remove());
+      clearAllButton.style.display = "none";
+    });
+
+    document.body.appendChild(clearAllButton);
+  }
+
+  // Show the button if hidden
+  clearAllButton.style.display = "block";
+
+  // Create a container div for the new audio player
+  const audioContainer = document.createElement("div");
+  audioContainer.classList.add("audio-player-container");
+
+  // Create the audio element
+  const audioElement = document.createElement("audio");
+  audioElement.src = audioURL;
+  audioElement.controls = true;  // Show controls (play/pause)
+  audioElement.autoplay = true;  // Automatically start playing
+  audioElement.style.height = "38px";
+
+  // Create the close button (X)
+  const closeButton = document.createElement("button");
+  closeButton.innerHTML = "&times;";  // Use an HTML entity for a "×" symbol
+  closeButton.classList.add("close-button");
+
+  // Add an event listener to close the audio player when clicked
+  closeButton.addEventListener("click", () => {
+    audioContainer.remove();  // Remove the entire audio container (audio + close button)
+    adjustAudioPositions();   // Re-adjust positions after removal
+  });
+
+  // Append the audio element and the close button to the container
+  audioContainer.appendChild(audioElement);
+  audioContainer.appendChild(closeButton);
+
+  // Count existing audio players
+  const existingPlayers = document.querySelectorAll('.audio-player-container');
+
+  // Set dynamic positioning so each new player appears above the previous one
+  const baseBottom = 10; // Initial bottom position
+  const spacing = 56; // Space between players
+  audioContainer.style.bottom = `${baseBottom + (existingPlayers.length * spacing)}px`;
+  audioContainer.style.right = "10px"; // Keep it fixed to the right
+
+  // Append the container to the body
+  document.body.appendChild(audioContainer);
+
+  // Function to re-adjust audio positions when one is removed
+  function adjustAudioPositions() {
+    const players = document.querySelectorAll('.audio-player-container');
+    players.forEach((player, index) => {
+      player.style.bottom = `${baseBottom + (index * spacing)}px`;
+    });
+  }
+}
