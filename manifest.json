@@ -38,7 +38,7 @@
   "commands": {
     "tts_with_kokoro": {
       "suggested_key": {
-        "default": "Alt+T"
+        "default": "Alt+S"
       },
       "description": "Use Kokoro TTS"
     }

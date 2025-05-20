@@ -86,7 +86,11 @@ function createAudioPlayer(audioURL) {
   const audioElement = document.createElement("audio");
   audioElement.src = audioURL;
   audioElement.controls = true;  // Show controls (play/pause)
-  audioElement.autoplay = true;  // Automatically start playing
+  const isMediaPlaying = Array.from(document.querySelectorAll('audio, video')).some(el => !el.paused && !el.ended && el.readyState > 2);
+
+  // Set autoplay to false if other media is playing
+  audioElement.autoplay = !isMediaPlaying;
+
   audioElement.style.height = "38px";
 
   // Create the close button (X)
