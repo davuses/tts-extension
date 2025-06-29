@@ -53,19 +53,18 @@ function createAudioPlayer(audioURL) {
   if (!clearAllButton) {
     clearAllButton = document.createElement("button");
     clearAllButton.id = "clear-all-audio-button";
-    clearAllButton.textContent = "Clear";
+    clearAllButton.textContent = "🧹";
     clearAllButton.style.position = "fixed";
-    clearAllButton.style.bottom = "10px";
-    clearAllButton.style.right = "375px";
-    clearAllButton.style.marginBottom = "8px";
-    clearAllButton.style.padding = "8px 12px";
-    clearAllButton.style.backgroundColor = "#e74c3c";
+    clearAllButton.style.bottom = "6px";
+    clearAllButton.style.right = "470px";
+    clearAllButton.style.padding = "7px";
+    clearAllButton.style.backgroundColor = "rgb(196 59 59 / 16%)";
     clearAllButton.style.color = "white";
     clearAllButton.style.border = "none";
     clearAllButton.style.borderRadius = "26px";
     clearAllButton.style.cursor = "pointer";
     clearAllButton.style.zIndex = "10000";
-    clearAllButton.style.fontWeight = "bold";
+    clearAllButton.style.fontSize = "22px";
 
     clearAllButton.addEventListener("click", () => {
       document.querySelectorAll('.audio-player-container').forEach(el => el.remove());
@@ -93,6 +92,24 @@ function createAudioPlayer(audioURL) {
 
   audioElement.style.height = "38px";
 
+  // Create the delay play button
+  const delayPlayButton = document.createElement("button");
+  delayPlayButton.textContent = "▶ Delay";
+  delayPlayButton.style.marginRight = "8px";
+  delayPlayButton.style.padding = "4px 10px";
+  delayPlayButton.style.border = "none";
+  delayPlayButton.style.backgroundColor = "#3498db";
+  delayPlayButton.style.color = "white";
+  delayPlayButton.style.borderRadius = "6px";
+  delayPlayButton.style.cursor = "pointer";
+  delayPlayButton.addEventListener("click", () => {
+    delayPlayButton.disabled = true;
+    setTimeout(() => {
+      audioElement.play();
+      delayPlayButton.disabled = false;
+    }, 2000);
+  });
+
   // Create the close button (X)
   const closeButton = document.createElement("button");
   closeButton.innerHTML = "&times;";  // Use an HTML entity for a "×" symbol
@@ -104,9 +121,11 @@ function createAudioPlayer(audioURL) {
     adjustAudioPositions();   // Re-adjust positions after removal
   });
 
-  // Append the audio element and the close button to the container
+  // Append the audio element, delay button, and close button to the container
+  audioContainer.appendChild(delayPlayButton);
   audioContainer.appendChild(audioElement);
   audioContainer.appendChild(closeButton);
+
 
   // Count existing audio players
   const existingPlayers = document.querySelectorAll('.audio-player-container');
