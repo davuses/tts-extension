@@ -102,6 +102,7 @@ function createAudioPlayer(audioURL) {
   delayPlayButton.style.color = "white";
   delayPlayButton.style.borderRadius = "6px";
   delayPlayButton.style.cursor = "pointer";
+  delayPlayButton.style.fontFamily = "sans-serif";
   delayPlayButton.addEventListener("click", () => {
     delayPlayButton.disabled = true;
     setTimeout(() => {
