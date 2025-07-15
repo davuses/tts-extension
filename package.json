@@ -1,0 +1,13 @@
+{
+  "name": "tts-with-kokoro-extension",
+  "version": "1.0.0",
+  "description": "Cross-browser extension for Kokoro TTS",
+  "scripts": {
+    "build:chrome": "node build.js chrome",
+    "build:firefox": "node build.js firefox",
+    "start:firefox": "web-ext run --source-dir=dist-firefox"
+  },
+  "devDependencies": {
+    "deepmerge": "^4.3.1"
+  }
+}
