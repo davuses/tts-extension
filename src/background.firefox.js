@@ -8,6 +8,14 @@ api.runtime.onInstalled.addListener(() => {
   });
 });
 
+api.runtime.onStartup.addListener(() => {
+  api.contextMenus.create({
+    id: "ttsWithKokoro",
+    title: "TTS with Kokoro",
+    contexts: ["selection"],
+  });
+});
+
 api.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "ttsWithKokoro") {
     const selectedText = info.selectionText;
