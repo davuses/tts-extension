@@ -1,7 +1,7 @@
 // Listen for messages from the background script
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "playAudio") {
+  if (message.action === "tts_kokoro") {
     const base64Audio = message.audioBase64;
 
     if (base64Audio) {
@@ -25,31 +25,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const audioURL = URL.createObjectURL(audioBlob);
       createAudioPlayer(audioURL);
     } else {
-      console.error('No audio data received');
+      console.error("No audio data received");
     }
-  }
-  else if (message.action === "audioURL") {
+  } else if (message.action === "tts_edge") {
     const text = message.text;
-    generateAudio(text, 'en-US-AndrewNeural', { pitch: 0, rate: 0 }).then(
-      url => {
+    generateAudio(text, "en-US-AndrewNeural", { pitch: 0, rate: 0 }).then(
+      (url) => {
         const audioURL = url;
         createAudioPlayer(audioURL);
-      });
-
-  }
-  else if (message.action === "getSelectedText") {
+      }
+    );
+  } else if (message.action === "tts_google_translate") {
+    const text = message.text;
+    const audioURL = `https://www.google.com/speech-api/v1/synthesize?text=${text}&enc=mpeg&lang=en-us&speed=0.45&client=lr-language-tts&use_google_only_voices=1`;
+    createAudioPlayer(audioURL);
+  } else if (message.action === "getSelectedText") {
     const selectedText = window.getSelection().toString();
     if (selectedText) {
       sendResponse({ success: true, text: selectedText });
-    };
+    }
   }
-}
-);
+});
 
 function createAudioPlayer(audioURL) {
   // Create or reuse the Clear All button
 
-  let clearAllButton = document.querySelector('#clear-all-audio-button');
+  let clearAllButton = document.querySelector("#clear-all-audio-button");
   if (!clearAllButton) {
     clearAllButton = document.createElement("button");
     clearAllButton.id = "clear-all-audio-button";
@@ -67,7 +68,9 @@ function createAudioPlayer(audioURL) {
     clearAllButton.style.fontSize = "22px";
 
     clearAllButton.addEventListener("click", () => {
-      document.querySelectorAll('.audio-player-container').forEach(el => el.remove());
+      document
+        .querySelectorAll(".audio-player-container")
+        .forEach((el) => el.remove());
       clearAllButton.style.display = "none";
     });
 
@@ -84,8 +87,10 @@ function createAudioPlayer(audioURL) {
   // Create the audio element
   const audioElement = document.createElement("audio");
   audioElement.src = audioURL;
-  audioElement.controls = true;  // Show controls (play/pause)
-  const isMediaPlaying = Array.from(document.querySelectorAll('audio, video')).some(el => !el.paused && !el.ended && el.readyState > 2);
+  audioElement.controls = true; // Show controls (play/pause)
+  const isMediaPlaying = Array.from(
+    document.querySelectorAll("audio, video")
+  ).some((el) => !el.paused && !el.ended && el.readyState > 2);
 
   // Set autoplay to false if other media is playing
   audioElement.autoplay = !isMediaPlaying;
@@ -113,13 +118,13 @@ function createAudioPlayer(audioURL) {
 
   // Create the close button (X)
   const closeButton = document.createElement("button");
-  closeButton.innerHTML = "&times;";  // Use an HTML entity for a "×" symbol
+  closeButton.innerHTML = "&times;"; // Use an HTML entity for a "×" symbol
   closeButton.classList.add("close-button");
 
   // Add an event listener to close the audio player when clicked
   closeButton.addEventListener("click", () => {
-    audioContainer.remove();  // Remove the entire audio container (audio + close button)
-    adjustAudioPositions();   // Re-adjust positions after removal
+    audioContainer.remove(); // Remove the entire audio container (audio + close button)
+    adjustAudioPositions(); // Re-adjust positions after removal
   });
 
   // Append the audio element, delay button, and close button to the container
@@ -127,14 +132,15 @@ function createAudioPlayer(audioURL) {
   audioContainer.appendChild(audioElement);
   audioContainer.appendChild(closeButton);
 
-
   // Count existing audio players
-  const existingPlayers = document.querySelectorAll('.audio-player-container');
+  const existingPlayers = document.querySelectorAll(".audio-player-container");
 
   // Set dynamic positioning so each new player appears above the previous one
   const baseBottom = 10; // Initial bottom position
   const spacing = 56; // Space between players
-  audioContainer.style.bottom = `${baseBottom + (existingPlayers.length * spacing)}px`;
+  audioContainer.style.bottom = `${
+    baseBottom + existingPlayers.length * spacing
+  }px`;
   audioContainer.style.right = "10px"; // Keep it fixed to the right
 
   // Append the container to the body
@@ -142,9 +148,9 @@ function createAudioPlayer(audioURL) {
 
   // Function to re-adjust audio positions when one is removed
   function adjustAudioPositions() {
-    const players = document.querySelectorAll('.audio-player-container');
+    const players = document.querySelectorAll(".audio-player-container");
     players.forEach((player, index) => {
-      player.style.bottom = `${baseBottom + (index * spacing)}px`;
+      player.style.bottom = `${baseBottom + index * spacing}px`;
     });
   }
 }

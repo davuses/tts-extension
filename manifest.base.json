@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TTS with Kokoro",
-  "version": "2.0.1",
+  "version": "2.2",
   "description": "Use Kokoro TTS",
   "background": {
     "service_worker": "background.js",
@@ -15,32 +15,20 @@
       "128": "icons/icon128.png"
     }
   },
-  "permissions": [
-    "activeTab",
-    "contextMenus",
-    "notifications",
-    "storage"
-  ],
+  "permissions": ["activeTab", "contextMenus", "notifications", "storage"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "css": [
-        "styles.css"
-      ],
-      "js": [
-        "tts.umd.js",
-        "content.js"
-      ]
+      "matches": ["<all_urls>"],
+      "css": ["styles.css"],
+      "js": ["tts.umd.js", "content.js"]
     }
   ],
   "commands": {
-    "tts_with_kokoro": {
+    "Text to Speech": {
       "suggested_key": {
         "default": "Alt+S"
       },
-      "description": "Use Kokoro TTS"
+      "description": "Text to Speech"
     }
   },
   "icons": {

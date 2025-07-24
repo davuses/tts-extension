@@ -49,10 +49,16 @@ const copyRecursive = (src, dest) => {
 copyRecursive(publicDir, distDir);
 
 // Copy correct background script
-const backgroundFile = isFirefox ? "background.firefox.js" : "background.js";
-fs.copyFileSync(path.join(srcDir, backgroundFile), path.join(distDir, "background.js"));
+const backgroundFile = "background.js";
+fs.copyFileSync(
+  path.join(srcDir, backgroundFile),
+  path.join(distDir, "background.js")
+);
 
 // Copy content script
-fs.copyFileSync(path.join(srcDir, "content.js"), path.join(distDir, "content.js"));
+fs.copyFileSync(
+  path.join(srcDir, "content.js"),
+  path.join(distDir, "content.js")
+);
 
 console.log(`✅ Built ${target} extension → ${distDir}/`);

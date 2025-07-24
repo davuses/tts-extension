@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TTS Settings</title>
-  <link rel="stylesheet" href="popup.css">
-</head>
-<body>
-  <div class="popup-container">
-    <h1 class="popup-title">Select TTS Engine</h1>
-    <div class="tts-option">
-      <label for="tts-select" class="option-label">Choose a TTS Service</label>
-      <select id="tts-select" class="option-select">
-        <option value="edge-tts">Microsoft Edge TTS</option>
-        <option value="kokoro-gpu">Kokoro GPU</option>
-        <option value="kokoro-online">Kokoro Online</option>
-      </select>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTS Settings</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="popup-container">
+      <h1 class="popup-title">Select TTS Engine</h1>
+      <div class="tts-option">
+        <label for="tts-select" class="option-label"
+          >Choose a TTS Service</label
+        >
+        <select id="tts-select" class="option-select">
+          <option value="tts-edge">Edge</option>
+          <option value="tts-kokoro">Kokoro</option>
+          <option value="tts-google-translate">Google Translate</option>
+        </select>
+      </div>
     </div>
-  </div>
 
-  <script src="popup.js"></script>
-</body>
+    <script src="popup.js"></script>
+  </body>
 </html>

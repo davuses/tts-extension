@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.ttsEngine) {
       ttsSelect.value = data.ttsEngine;
     } else {
-      ttsSelect.value = "edge-tts";  // Default value
+      ttsSelect.value = "tts-edge"; // Default value
     }
   });
 
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ttsSelect.addEventListener("change", () => {
     const selectedEngine = ttsSelect.value;
     chrome.storage.sync.set({ ttsEngine: selectedEngine }, () => {
-      console.log('Settings saved for:', selectedEngine);
+      console.log("Settings saved for:", selectedEngine);
     });
   });
 });
