@@ -18,3 +18,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+const select = document.getElementById("tts-select");
+
+select.addEventListener("wheel", (event) => {
+  event.preventDefault(); // Prevent default page scrolling
+
+  const currentIndex = select.selectedIndex;
+  const maxIndex = select.options.length - 1;
+
+  if (event.deltaY > 0 && currentIndex < maxIndex) {
+    // Scroll down: go to next option
+    select.selectedIndex += 1;
+  } else if (event.deltaY < 0 && currentIndex > 0) {
+    // Scroll up: go to previous option
+    select.selectedIndex -= 1;
+  }
+
+  // Optional: trigger change event if needed
+  select.dispatchEvent(new Event("change"));
+});
