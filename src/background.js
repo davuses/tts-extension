@@ -52,7 +52,26 @@ async function handleTTS(selectedText, tabId) {
           });
 
           if (!response.ok) {
-            console.error("Error with TTS request:", response.statusText);
+            const status = response.status;
+            let errorDetail = "Unknown error";
+            try {
+              const errorData = await response.json();
+              if (errorData.detail) {
+                errorDetail = errorData.detail;
+              }
+            } catch (e) {
+              console.error("Failed to parse error response:", e);
+            }
+            const errorMessage = `Error playing TTS audio: ${status} - ${errorDetail}`;
+
+            console.error(errorMessage);
+
+            api.notifications.create({
+              type: "basic",
+              iconUrl: "icons/icon128.png",
+              title: "TTS Server Error",
+              message: errorMessage,
+            });
             return;
           }
 
@@ -75,8 +94,7 @@ async function handleTTS(selectedText, tabId) {
             type: "basic",
             iconUrl: "icons/icon128.png",
             title: "TTS Server Error",
-            message:
-              "Please ensure the Kokoro TTS server is running at http://localhost:18001",
+            message: `Error playing TTS audio:, ${error}. Please make sure the server is running at port 18001`,
           });
         }
         break;
