@@ -25,79 +25,81 @@ api.contextMenus.onClicked.addListener(async (info, tab) => {
 
 async function handleTTS(selectedText, tabId) {
   api.storage.sync.get("ttsEngine", async (data) => {
-    const ttsEngine = data.ttsEngine || "edge-tts";
+    const ttsEngine = data.ttsEngine || "google-translate";
+    if (ttsEngine.startsWith("kokoro")) {
+      const voice = ttsEngine.split("_").slice(1).join("_");
 
-    switch (ttsEngine) {
-      case "tts-edge":
-        api.tabs.sendMessage(tabId, {
-          action: "tts_edge",
-          text: selectedText,
+      try {
+        const apiUrl = "http://localhost:18001/tts";
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: selectedText, voice: voice }),
         });
-        break;
-      case "tts-google-translate":
-        api.tabs.sendMessage(tabId, {
-          action: "tts_google_translate",
-          text: selectedText,
-        });
-        break;
-      case "tts-kokoro":
-        try {
-          const apiUrl = "http://localhost:18001/tts";
-          const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ text: selectedText }),
-          });
 
-          if (!response.ok) {
-            const status = response.status;
-            let errorDetail = "Unknown error";
-            try {
-              const errorData = await response.json();
-              if (errorData.detail) {
-                errorDetail = errorData.detail;
-              }
-            } catch (e) {
-              console.error("Failed to parse error response:", e);
+        if (!response.ok) {
+          const status = response.status;
+          let errorDetail = "Unknown error";
+          try {
+            const errorData = await response.json();
+            if (errorData.detail) {
+              errorDetail = errorData.detail;
             }
-            const errorMessage = `Error playing TTS audio: ${status} - ${errorDetail}`;
-
-            console.error(errorMessage);
-
-            api.notifications.create({
-              type: "basic",
-              iconUrl: "icons/icon128.png",
-              title: "TTS Server Error",
-              message: errorMessage,
-            });
-            return;
+          } catch (e) {
+            console.error("Failed to parse error response:", e);
           }
+          const errorMessage = `Error playing TTS audio: ${status} - ${errorDetail}`;
 
-          const audioBlob = await response.blob();
+          console.error(errorMessage);
 
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64Audio = reader.result.split(",")[1]; // Get base64 part
-
-            // Send the base64 audio to the content script
-            api.tabs.sendMessage(tabId, {
-              action: "tts_kokoro",
-              audioBase64: base64Audio,
-            });
-          };
-          reader.readAsDataURL(audioBlob);
-        } catch (error) {
-          console.error("Error playing TTS audio:", error);
           api.notifications.create({
             type: "basic",
             iconUrl: "icons/icon128.png",
             title: "TTS Server Error",
-            message: `Error playing TTS audio:, ${error}. Please make sure the server is running at port 18001`,
+            message: errorMessage,
           });
+          return;
         }
-        break;
+
+        const audioBlob = await response.blob();
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result.split(",")[1]; // Get base64 part
+
+          // Send the base64 audio to the content script
+          api.tabs.sendMessage(tabId, {
+            action: "tts_kokoro",
+            audioBase64: base64Audio,
+          });
+        };
+        reader.readAsDataURL(audioBlob);
+      } catch (error) {
+        console.error("Error playing TTS audio:", error);
+        api.notifications.create({
+          type: "basic",
+          iconUrl: "icons/icon128.png",
+          title: "TTS Server Error",
+          message: `Error playing TTS audio:, ${error}. Please make sure the server is running at port 18001`,
+        });
+      }
+    } else {
+      switch (ttsEngine) {
+        case "edge":
+          api.tabs.sendMessage(tabId, {
+            action: "tts_edge",
+            text: selectedText,
+          });
+          break;
+        case "google-translate":
+          api.tabs.sendMessage(tabId, {
+            action: "tts_google_translate",
+            text: selectedText,
+          });
+          break;
+      }
     }
   });
 }
