@@ -97,6 +97,16 @@ function createAudioPlayer(audioURL) {
 
   audioElement.style.height = "38px";
 
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaElementSource(audioElement);
+  const gainNode = audioCtx.createGain();
+  chrome.storage.sync.get(["volumeBoostIndex"], (result) => {
+    const gainLevels = [1.0, 1.25, 1.5, 1.75, 2.0];
+    const boost = gainLevels[result.volumeBoostIndex ?? 0]; // default = 100%
+    gainNode.gain.value = boost;
+  });
+  source.connect(gainNode).connect(audioCtx.destination);
+
   // Create the delay play button
   const delayPlayButton = document.createElement("button");
   delayPlayButton.textContent = "▶ Delay";
@@ -111,6 +121,7 @@ function createAudioPlayer(audioURL) {
   delayPlayButton.addEventListener("click", () => {
     delayPlayButton.disabled = true;
     setTimeout(() => {
+      audioCtx.resume(); // required to start audio context
       audioElement.play();
       delayPlayButton.disabled = false;
     }, 2000);

@@ -17,6 +17,21 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Settings saved for:", selectedEngine);
     });
   });
+
+  const gainSlider = document.getElementById("gain-slider");
+  const gainLevels = [1.0, 1.25, 1.5, 1.75, 2.0];
+  chrome.storage.sync.get(["volumeBoostIndex"], (result) => {
+    if (result.volumeBoostIndex !== undefined) {
+      gainSlider.value = result.volumeBoostIndex;
+    }
+  });
+
+  gainSlider.addEventListener("input", () => {
+    const index = parseInt(gainSlider.value, 10);
+    chrome.storage.sync.set({ volumeBoostIndex: index }, () => {
+      console.log("Saved volume boost:", gainLevels[index]);
+    });
+  });
 });
 const select = document.getElementById("tts-select");
 
